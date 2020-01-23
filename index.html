@@ -1,0 +1,51 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Simon</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="reset.css">
+  <script src="https://kit.fontawesome.com/f21fa47f56.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="game-board">
+      <div>
+        <button id="green" class="game-btn green">
+        <button id="red" class="game-btn red">
+      </div>
+      <div>
+        <button id="yellow" class="game-btn yellow">
+        <button id="blue" class="game-btn blue">
+      </div>
+    </div>
+    <div id="score-display">
+      <div>Scr</div>
+      <div id="score">0</div>
+      <div id="high-score-display" class="hidden">Best: <span id="high-score">0</span></div style="position:relative">
+    </div>
+  </div>
+  <div class="overlay">
+    <button id="play" class="knob"><i class="fas fa-play"></i></button>
+  </div>
+  <i id="volume-control" class="fas fa-volume"></i>
+  <audio id="green-note">
+    <source src="audio/note1.ogg" type="audio/ogg">
+    <source src="audio/note1.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="red-note">
+    <source src="audio/note2.ogg" type="audio/ogg">
+    <source src="audio/note2.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="yellow-note">
+    <source src="audio/note3.ogg" type="audio/ogg">
+    <source src="audio/note3.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="blue-note">
+    <source src="audio/note4.ogg" type="audio/ogg">
+    <source src="audio/note4.mp3" type="audio/mpeg">
+  </audio>
+  <script src="main.js"></script>
+</body>
+</html>
