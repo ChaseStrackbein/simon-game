@@ -514,6 +514,19 @@ body.dark .floating-btn.disabled {
   left: 0;
 }
 
+.badge {
+  background-color: #ff5e5e;
+  border: 0rem solid #ff5e5e;
+  border-radius: 1rem;
+  bottom: 0;
+  color: #fff;
+  font-size: 1rem;
+  font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 0.25rem 0.5rem;
+  position: absolute;
+  right: 0;
+}
+
 @font-face {
   font-family: lcd;
   src: url(../webfonts/alarm-clock.ttf);

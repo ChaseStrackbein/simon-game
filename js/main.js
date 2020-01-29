@@ -5,6 +5,8 @@
   const scoreEl = document.getElementById('score')
   const highScoreWrapper = document.getElementById('high-score-display')
   const highScoreEl = document.getElementById('high-score')
+  const repeatBtn = document.getElementById('repeat-btn')
+  const repeatTokenEl = repeatBtn.getElementsByClassName('badge')[0]
   const settingsBtn = document.getElementById('settings-btn')
   const muteBtn = document.getElementById('mute-btn')
   const muteIcon = muteBtn.getElementsByTagName('i')[0]
@@ -45,13 +47,15 @@
     btn.el.addEventListener('click', () => onPlayerPress(btn))
     btn.el.disabled = true
   })
+  repeatBtn.addEventListener('click', repeat)
+  settingsBtn.addEventListener('click', openSettingsMenu)
   muteBtn.addEventListener('click', toggleMute)
   darkModeBtn.addEventListener('click', toggleDarkMode)
-  settingsBtn.addEventListener('click', openSettingsMenu)
   closeSettingsBtn.addEventListener('click', closeSettingsMenu)
   loadHighScore()
   loadDarkMode()
   loadMuteSetting()
+  loadRepeatTokens()
 
   /// Game state functions
 
@@ -102,6 +106,7 @@
    * Simon takes a turn
    */
   async function simonTurn () {
+    repeatBtn.classList.add('disabled')
     await wait(100)
     buttons.forEach(btn => btn.el.disabled = true)
     playerTurn = 0
@@ -110,10 +115,7 @@
     await wait(scaleNumber(950, 250, 20))
 
     // Repeat previous sequence
-    for (let i = 0; i < sequence.length; i++) {
-      await simonPress(sequence[i])
-      await wait(scaleNumber(500, 50, 10))
-    }
+    await simonRepeat()
 
     // Add another random button to the sequence
     let randomBtn = buttons[Math.floor(Math.random() * buttons.length)]
@@ -121,6 +123,14 @@
     await simonPress(randomBtn)
 
     buttons.forEach(btn => btn.el.disabled = false)
+    repeatBtn.classList.remove('disabled')
+  }
+
+  async function simonRepeat () {
+    for (let i = 0; i < sequence.length; i++) {
+      await simonPress(sequence[i])
+      await wait(scaleNumber(500, 50, 10))
+    }
   }
 
   /**
@@ -183,6 +193,22 @@
 
     if (note.paused) note.play()
     else note.currentTime = 0
+  }
+
+  /**
+   * Uses a repeat token to replay Simon's last sequence
+   */
+  async function repeat () {
+    // Catch disabled repeat button
+    if (repeatBtn.classList.contains('disabled')) return
+    // User is not in-game
+    if (!isPlaying) return
+    // User has no repeat tokens
+    if (!removeRepeatToken()) return
+
+    repeatBtn.classList.add('disabled')
+    await simonRepeat()
+    repeatBtn.classList.remove('disabled')
   }
 
   /**
@@ -249,7 +275,6 @@
     }
   }
 
-
   /**
    * Save the user's high score to local storage
    * @param {number} score score to save
@@ -267,6 +292,41 @@
     if (highScore) {
       showHighScore(highScore)
     }
+  }
+
+  /**
+   * Increment user's repeat tokens by 1
+   */
+  function addRepeatToken () {
+    let repeatTokens = parseInt(localStorage.getItem('repeatTokens')) || 0
+    repeatTokens++
+    localStorage.setItem('repeatTokens', repeatTokens)
+    repeatTokenEl.classList.remove('hidden')
+    repeatTokenEl.innerText = repeatTokens
+  }
+
+  /**
+   * Decrement user's repeat tokens by 1
+   * @returns {boolean} true if able to remove a repeat token, else false
+   */
+  function removeRepeatToken () {
+    let repeatTokens = parseInt(localStorage.getItem('repeatTokens')) || 0
+    if (repeatTokens === 0) return false
+    repeatTokens--
+    localStorage.setItem('repeatTokens', repeatTokens)
+    if (!repeatTokens) repeatTokenEl.classList.add('hidden')
+    repeatTokenEl.innerText = repeatTokens
+    return true
+  }
+
+  /**
+   * Load the user's current repeat tokens
+   */
+  function loadRepeatTokens () {
+    let repeatTokens = parseInt(localStorage.getItem('repeatTokens')) || 0
+    if (!repeatTokens) repeatTokenEl.classList.add('hidden')
+    else repeatTokenEl.classList.remove('hidden')
+    repeatTokenEl.innerText = repeatTokens
   }
 
   /**
