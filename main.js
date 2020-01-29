@@ -1,10 +1,18 @@
 (function () {
   // Cache DOM elements
+  const bodyEl = document.getElementById('body')
   const playBtn = document.getElementById('play')
   const scoreEl = document.getElementById('score')
   const highScoreWrapper = document.getElementById('high-score-display')
   const highScoreEl = document.getElementById('high-score')
-  const volumeControl = document.getElementById('volume-control')
+  const settingsBtn = document.getElementById('settings-btn')
+  const muteBtn = document.getElementById('mute-btn')
+  const muteIcon = muteBtn.getElementsByTagName('i')[0]
+  const darkModeBtn = document.getElementById('dark-mode-btn')
+  const darkModeIcon = darkModeBtn.getElementsByTagName('i')[0]
+  const dimmerEl = document.getElementById('dimmer')
+  const settingsPopupEl = document.getElementById('settings')
+  const closeSettingsBtn = document.getElementById('close-settings')
   const buttons = [
     {
       el: document.getElementById('green'),
@@ -34,11 +42,15 @@
   // DOM init
   playBtn.addEventListener('click', newGame)
   buttons.forEach(btn => {
-    btn.el.addEventListener('mousedown', () => onPlayerPress(btn))
+    btn.el.addEventListener('click', () => onPlayerPress(btn))
     btn.el.disabled = true
   })
-  volumeControl.addEventListener('click', toggleMute)
+  darkModeBtn.addEventListener('click', toggleDarkMode)
+  muteBtn.addEventListener('click', toggleMute)
+  settingsBtn.addEventListener('click', openSettingsMenu)
+  closeSettingsBtn.addEventListener('click', closeSettingsMenu)
   loadHighScore()
+  loadDarkMode()
   loadMuteSetting()
 
   /// Game state functions
@@ -65,12 +77,11 @@
   /**
    * Ends the current game session
    */
-  function gameOver () {
+  async function gameOver () {
     // DOM effects
     scoreEl.classList.add('flash')
     sequence[playerTurn].el.classList.add('flash')
     buttons.forEach(btn => btn.el.disabled = true)
-    playBtn.disabled = false
 
     // Check for high score
     let score = parseInt(scoreEl.innerText)
@@ -78,6 +89,8 @@
     if (score > highscore) {
       saveHighScore(score)
     }
+
+    playBtn.disabled = false
 
     // Set game state
     isPlaying = false
@@ -89,7 +102,7 @@
    * Simon takes a turn
    */
   async function simonTurn () {
-    await wait(50)
+    await wait(100)
     buttons.forEach(btn => btn.el.disabled = true)
     playerTurn = 0
 
@@ -186,14 +199,13 @@
     let scale = divisor / dividend
     return initialValue - (finalDifference * scale)
   }
-
   /**
    * Toggle game mute
    */
   function toggleMute () {
     isMuted = !isMuted
-    volumeControl.classList.toggle('fa-volume')
-    volumeControl.classList.toggle('fa-volume-mute')
+    muteIcon.classList.toggle('fa-volume')
+    muteIcon.classList.toggle('fa-volume-mute')
     if (isMuted) {
       buttons.forEach(btn => btn.note.pause())
       localStorage.setItem('volume', 'mute')
@@ -209,10 +221,34 @@
     const volume = localStorage.getItem('volume')
     if (volume === 'mute') {
       isMuted = true
-      volumeControl.classList.remove('fa-volume')
-      volumeControl.classList.add('fa-volume-mute')
+      muteIcon.classList.remove('fa-volume')
+      muteIcon.classList.add('fa-volume-mute')
     }
   }
+
+  /**
+   * Toggle dark mode
+   */
+  function toggleDarkMode () {
+    darkModeIcon.classList.toggle('fa-sun')
+    darkModeIcon.classList.toggle('fa-eclipse-alt')
+    bodyEl.classList.toggle('dark')
+    if (localStorage.getItem('darkMode')) localStorage.removeItem('darkMode')
+    else localStorage.setItem('darkMode', 'on')
+  }
+
+  /**
+   * Loads the user's dark mode preference from local storage
+   */
+  function loadDarkMode () {
+    const darkMode = localStorage.getItem('darkMode')
+    if (darkMode === 'on') {
+      darkModeIcon.classList.remove('fa-sun')
+      darkModeIcon.classList.add('fa-eclipse-alt')
+      bodyEl.classList.add('dark')
+    }
+  }
+
 
   /**
    * Save the user's high score to local storage
@@ -240,6 +276,27 @@
   function showHighScore (score) {
     highScoreEl.innerText = score
     highScoreWrapper.classList.remove('hidden')
+  }
+
+  /**
+   * Open the settings menu popup
+   */
+  function openSettingsMenu () {
+    dimmerEl.classList.remove('hidden')
+    settingsPopupEl.classList.remove('hidden')
+    settingsPopupEl.classList.remove('close')
+    settingsPopupEl.classList.add('open')
+  }
+
+  /**
+   * Close the settings menu popup
+   */
+  async function closeSettingsMenu () {
+    dimmerEl.classList.add('hidden')
+    settingsPopupEl.classList.remove('open')
+    settingsPopupEl.classList.add('close')
+    await wait(200)
+    settingsPopupEl.classList.add('hidden')
   }
   
 })()
