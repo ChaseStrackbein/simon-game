@@ -45,8 +45,8 @@
     btn.el.addEventListener('click', () => onPlayerPress(btn))
     btn.el.disabled = true
   })
-  darkModeBtn.addEventListener('click', toggleDarkMode)
   muteBtn.addEventListener('click', toggleMute)
+  darkModeBtn.addEventListener('click', toggleDarkMode)
   settingsBtn.addEventListener('click', openSettingsMenu)
   closeSettingsBtn.addEventListener('click', closeSettingsMenu)
   loadHighScore()
